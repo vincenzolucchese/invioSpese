@@ -1,0 +1,8 @@
+2021-01-26 22:46:08.800  INFO 5596 --- [restartedMain] c.a.invioSpese.InvioSpeseApplication     : Starting InvioSpeseApplication using Java 15.0.1 on vlucchese-Latitude-7480 with PID 5596 (/home/vlucchese/WORKSPACES/JAVA/invioSpeseSanitarie/invioSpese/target/classes started by vlucchese in /home/vlucchese/WORKSPACES/JAVA/invioSpeseSanitarie/invioSpese)
+2021-01-26 22:46:08.803  INFO 5596 --- [restartedMain] c.a.invioSpese.InvioSpeseApplication     : No active profile set, falling back to default profiles: default
+2021-01-26 22:46:08.836  INFO 5596 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2021-01-26 22:46:09.245  INFO 5596 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2021-01-26 22:46:09.258  INFO 5596 --- [restartedMain] c.a.invioSpese.InvioSpeseApplication     : Started InvioSpeseApplication in 0.67 seconds (JVM running for 1.448)
+2021-01-26 22:46:09.259  INFO 5596 --- [restartedMain] c.a.invioSpese.InvioSpeseApplication     : Start procedure.
+2021-01-26 22:46:09.260  INFO 5596 --- [restartedMain] com.altevie.invioSpese.StepManager       : ./output
+2021-01-26 22:46:09.260  INFO 5596 --- [restartedMain] c.a.invioSpese.InvioSpeseApplication     : End procedure.
