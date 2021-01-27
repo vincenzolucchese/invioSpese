@@ -1,11 +1,14 @@
 package com.altevie.invioSpese;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -19,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.altevie.invioSpese.jaxb.fileAllegato.Precompilata;
@@ -207,7 +211,7 @@ public class StepManager {
         return "createxmlenc";
     }
 
-	public void performs() {
+	public void performs() throws Exception {
 		Date timestamp = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 		String format = formatter.format(timestamp);
@@ -224,22 +228,128 @@ public class StepManager {
 		performsSportSalute(outputPathDir);		
 	}
 
-	private void performsSportSalute(String outputPathDir) {
+	private void performsSportSalute(String outputPathDir) throws JAXBException, IOException {
+    	JAXBContext jaxbContext = JAXBContext.newInstance (Precompilata.class);    	
+    	Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+    	Marshaller jaxbMarshaller = jaxbContext.createMarshaller();	
+    	
 		DirectoryScanner scanner = new DirectoryScanner();
 		scanner.setIncludes(new String[]{"**/*.xml"});
 		scanner.setBasedir(configPropertiesIvioSpese.getSourceSportSalute());
 		scanner.setCaseSensitive(false);
 		scanner.scan();
 		String[] files = scanner.getIncludedFiles();
+		if(!CollectionUtils.isEmpty(Arrays.asList(files))) {
+			for (String each : files) {
+				logger.info(each);
+				File fileInput = new File(configPropertiesIvioSpese.getSourceSportSalute()+"/"+each);
+				Precompilata precompilata = (Precompilata) jaxbUnmarshaller.unmarshal(fileInput);
+		    	if(precompilata.getProprietario()!=null) {
+		    		if(StringUtils.hasText(precompilata.getProprietario().getCfProprietario())) {
+		    			String cf = precompilata.getProprietario().getCfProprietario();
+		    			String cfEnc = encrypt.getEncryptStringBase64(cf);
+		    			precompilata.getProprietario().setCfProprietario(cfEnc);
+		    		}
+		    	}
+		    	for(DocumentoSpesa ds : precompilata.getDocumentoSpesa()) {
+		    		if(StringUtils.hasText(ds.getCfCittadino())) {
+		    			String cfcitt = ds.getCfCittadino();
+		    			String cfcittEnc = encrypt.getEncryptStringBase64(cfcitt);
+		    			ds.setCfCittadino(cfcittEnc);
+		    		}
+		    		/*
+		    		ds.setPagamentoTracciato("SI");
+		    		ds.setTipoDocumento("F");
+		    		ds.setFlagOpposizione("0");
+		    		if(!CollectionUtils.isEmpty(ds.getVoceSpesa())) {
+		        		for (Precompilata.DocumentoSpesa.VoceSpesa eachVoce : ds.getVoceSpesa()) {
+		        			eachVoce.setAliquotaIVA(null);
+		        			eachVoce.setNaturaIVA("N4");
+		    			}
+		    		}
+		    		*/
+		    	}		    	
+	    	
+		    	File directory = new File(outputPathDir+"/sport_salute");
+				if(!directory.exists()) { 
+					directory.mkdir();
+				}
+		    	File fileOutput = new File(outputPathDir+"/sport_salute/Encrypt_"+each);
+		    	fileOutput.createNewFile();
+		    	FileOutputStream oFile = new FileOutputStream(fileOutput, false); 
+				jaxbMarshaller.marshal(precompilata, fileOutput);		    	
+		    	logger.debug(fileOutput.getAbsolutePath());
+			}
+	    	File fileOutput = new File(outputPathDir+"/sport_salute/info.txt");
+	    	fileOutput.createNewFile();
+	    	FileOutputStream oFile = new FileOutputStream(fileOutput, false);
+	    	oFile.write(("pincode:" + encrypt.getEncryptStringBase64("")).getBytes());
+	    	oFile.flush();
+	    	oFile.close();
+		}
+
 	}
 
-	private void performsConi(String outputPathDir) {
+	private void performsConi(String outputPathDir) throws Exception {
+    	JAXBContext jaxbContext = JAXBContext.newInstance (Precompilata.class);    	
+    	Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+    	Marshaller jaxbMarshaller = jaxbContext.createMarshaller();	
+    	
 		DirectoryScanner scanner = new DirectoryScanner();
 		scanner.setIncludes(new String[]{"**/*.xml"});
 		scanner.setBasedir(configPropertiesIvioSpese.getSourceConi());
 		scanner.setCaseSensitive(false);
 		scanner.scan();
 		String[] files = scanner.getIncludedFiles();
+		if(!CollectionUtils.isEmpty(Arrays.asList(files))) {
+			for (String each : files) {
+				logger.info(each);
+				File fileInput = new File(configPropertiesIvioSpese.getSourceConi()+"/"+each);
+				Precompilata precompilata = (Precompilata) jaxbUnmarshaller.unmarshal(fileInput);
+		    	if(precompilata.getProprietario()!=null) {
+		    		if(StringUtils.hasText(precompilata.getProprietario().getCfProprietario())) {
+		    			String cf = precompilata.getProprietario().getCfProprietario();
+		    			String cfEnc = encrypt.getEncryptStringBase64(cf);
+		    			precompilata.getProprietario().setCfProprietario(cfEnc);
+		    		}
+		    	}
+		    	for(DocumentoSpesa ds : precompilata.getDocumentoSpesa()) {
+		    		if(StringUtils.hasText(ds.getCfCittadino())) {
+		    			String cfcitt = ds.getCfCittadino();
+		    			String cfcittEnc = encrypt.getEncryptStringBase64(cfcitt);
+		    			ds.setCfCittadino(cfcittEnc);
+		    		}
+		    		/*
+		    		ds.setPagamentoTracciato("SI");
+		    		ds.setTipoDocumento("F");
+		    		ds.setFlagOpposizione("0");
+		    		if(!CollectionUtils.isEmpty(ds.getVoceSpesa())) {
+		        		for (Precompilata.DocumentoSpesa.VoceSpesa eachVoce : ds.getVoceSpesa()) {
+		        			eachVoce.setAliquotaIVA(null);
+		        			eachVoce.setNaturaIVA("N4");
+		    			}
+		    		}
+		    		*/
+		    	}		    	
+	    	
+		    	File directory = new File(outputPathDir+"/coni");
+				if(!directory.exists()) { 
+					directory.mkdir();
+				}
+		    	File fileOutput = new File(outputPathDir+"/coni/Encrypt_"+each);
+		    	fileOutput.createNewFile();
+		    	FileOutputStream oFile = new FileOutputStream(fileOutput, false); 
+				jaxbMarshaller.marshal(precompilata, fileOutput);		    	
+		    	logger.debug(fileOutput.getAbsolutePath());
+			}
+	    	File fileOutput = new File(outputPathDir+"/coni/info.txt");
+	    	fileOutput.createNewFile();
+	    	FileOutputStream oFile = new FileOutputStream(fileOutput, false);
+	    	oFile.write(("pincode:" + encrypt.getEncryptStringBase64("")).getBytes());
+	    	oFile.flush();
+	    	oFile.close();
+		}
+
 	}
 
 	
